@@ -357,7 +357,17 @@ func buildSchemas() map[string]any {
 				"name":         map[string]any{"type": "string"},
 				"role":         map[string]any{"type": "string", "enum": []string{"user", "admin"}},
 				"channel_id":   map[string]any{"type": "string", "format": "uuid", "nullable": true},
+				"channel":      map[string]any{"allOf": []any{ref("ChannelSummary")}, "nullable": true},
 				"total_points": map[string]any{"type": "integer", "nullable": true},
+			},
+		},
+		"ChannelSummary": map[string]any{
+			"type":        "object",
+			"description": "Kullanıcının bağlı olduğu kanal özeti",
+			"properties": map[string]any{
+				"id":   map[string]any{"type": "string", "format": "uuid"},
+				"code": map[string]any{"type": "string", "example": "ABC123"},
+				"name": map[string]any{"type": "string", "example": "Okul Ligi", "description": "Kanal açıklaması"},
 			},
 		},
 		"Channel": map[string]any{

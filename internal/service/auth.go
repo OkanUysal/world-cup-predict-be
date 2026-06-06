@@ -36,11 +36,18 @@ type AuthResponse struct {
 }
 
 type UserProfile struct {
-	ID          string      `json:"id"`
-	Name        string      `json:"name"`
-	Role        domain.Role `json:"role"`
-	ChannelID   *string     `json:"channel_id,omitempty"`
-	TotalPoints *int        `json:"total_points,omitempty"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Role        domain.Role      `json:"role"`
+	ChannelID   *string          `json:"channel_id,omitempty"`
+	Channel     *ChannelSummary  `json:"channel,omitempty"`
+	TotalPoints *int             `json:"total_points,omitempty"`
+}
+
+type ChannelSummary struct {
+	ID   string `json:"id"`
+	Code string `json:"code"`
+	Name string `json:"name"`
 }
 
 func (s *AuthService) Register(ctx context.Context, name, password, channelCode string) (*AuthResponse, error) {

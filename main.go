@@ -44,7 +44,7 @@ func main() {
 	authService := service.NewAuthService(userRepo, channelRepo, tokenService)
 	channelService := service.NewChannelService(channelRepo)
 	eventService := service.NewEventService(eventRepo, predictionRepo, scoreRepo)
-	scoreService := service.NewScoreService(scoreRepo, userRepo)
+	scoreService := service.NewScoreService(scoreRepo, userRepo, channelRepo)
 
 	if err := authService.BootstrapAdmin(context.Background(), cfg.AdminBootstrapName, cfg.AdminBootstrapPassword); err != nil {
 		log.Fatalf("bootstrap admin: %v", err)

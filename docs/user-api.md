@@ -38,7 +38,16 @@ Hata durumlarında dönen standart yapı:
 | `name` | string | Evet | Kullanıcı adı |
 | `role` | string | Evet | `user` veya `admin` |
 | `channel_id` | string (uuid) | Hayır | Kullanıcının channel ID'si |
-| `total_points` | integer | Hayır | Toplam puan (sadece `/me` ve channel üyelerinde) |
+| `channel` | ChannelSummary | Hayır | Kanal bilgisi (sadece `/me`) |
+| `total_points` | integer | Hayır | Toplam puan (sadece `/me`) |
+
+### ChannelSummary
+
+| Alan | Tip | Açıklama |
+|------|-----|----------|
+| `id` | string (uuid) | Channel ID |
+| `code` | string | Channel kodu |
+| `name` | string | Kanal açıklaması (admin'in girdiği isim) |
 
 ### Event
 
@@ -235,6 +244,11 @@ Giriş yapmış kullanıcının profil ve puan bilgisi.
   "name": "ahmet",
   "role": "user",
   "channel_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  "channel": {
+    "id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "code": "ABC123",
+    "name": "Okul Ligi"
+  },
   "total_points": 15
 }
 ```
