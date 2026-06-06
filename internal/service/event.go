@@ -41,7 +41,8 @@ func (s *EventService) Create(ctx context.Context, eventType domain.EventType, t
 	if !deadline.After(time.Now()) {
 		return nil, fmt.Errorf("deadline must be in the future")
 	}
-	if eventType != domain.EventTypeMatchScore && eventType != domain.EventTypeChampion && eventType != domain.EventTypeRunnerUp {
+	if eventType != domain.EventTypeMatchScore && eventType != domain.EventTypeChampion &&
+		eventType != domain.EventTypeRunnerUp && eventType != domain.EventTypeThirdPlace {
 		return nil, fmt.Errorf("invalid event type")
 	}
 	return s.events.Create(ctx, eventType, title, metadata, deadline)
@@ -219,7 +220,7 @@ func validateChoice(eventType domain.EventType, choice json.RawMessage) error {
 		if c.HomeScore < 0 || c.AwayScore < 0 {
 			return fmt.Errorf("scores must be non-negative")
 		}
-	case domain.EventTypeChampion, domain.EventTypeRunnerUp:
+	case domain.EventTypeChampion, domain.EventTypeRunnerUp, domain.EventTypeThirdPlace:
 		var c scoring.TeamChoice
 		if err := json.Unmarshal(choice, &c); err != nil {
 			return fmt.Errorf("invalid team choice: expected {\"team\": \"...\"}")

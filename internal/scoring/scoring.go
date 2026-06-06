@@ -33,6 +33,8 @@ func CalculatePoints(eventType domain.EventType, choiceJSON, resultJSON json.Raw
 		return scoreTeamPick(choiceJSON, resultJSON, 10)
 	case domain.EventTypeRunnerUp:
 		return scoreTeamPick(choiceJSON, resultJSON, 5)
+	case domain.EventTypeThirdPlace:
+		return scoreTeamPick(choiceJSON, resultJSON, 3)
 	default:
 		return 0, fmt.Errorf("unknown event type: %s", eventType)
 	}

@@ -185,6 +185,17 @@ func (r *EventRepository) List(ctx context.Context, filter domain.EventListFilte
 	return events, rows.Err()
 }
 
+func (r *EventRepository) CountByTitlePrefix(ctx context.Context, prefix string) (int, error) {
+	var count int
+	err := r.db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM events WHERE title LIKE $1
+	`, prefix+"%").Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count events by prefix: %w", err)
+	}
+	return count, nil
+}
+
 func (r *EventRepository) RefreshStatus(ctx context.Context, e *domain.Event) {
 	if e.Status == domain.EventStatusOpen && !time.Now().Before(e.Deadline) {
 		e.Status = domain.EventStatusLocked

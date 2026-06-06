@@ -367,7 +367,7 @@ func buildSchemas() map[string]any {
 			"type": "object",
 			"properties": map[string]any{
 				"id":         map[string]any{"type": "string", "format": "uuid"},
-				"type":       map[string]any{"type": "string", "enum": []string{"match_score", "champion", "runner_up"}},
+				"type":       map[string]any{"type": "string", "enum": []string{"match_score", "champion", "runner_up", "third_place"}},
 				"title":      map[string]any{"type": "string", "example": "Brezilya vs Arjantin"},
 				"metadata":   ref("EventMetadata"),
 				"deadline":   map[string]any{"type": "string", "format": "date-time"},
@@ -378,14 +378,14 @@ func buildSchemas() map[string]any {
 		},
 		"EventMetadata": map[string]any{
 			"type":        "object",
-			"description": "match_score: {home_team, away_team} | champion/runner_up: {teams: [...]} (opsiyonel takım listesi)",
+			"description": "match_score: {home_team, away_team} | champion/runner_up/third_place: {teams: [...]}",
 			"example":     map[string]any{"home_team": "Brazil", "away_team": "Argentina"},
 		},
 		"CreateEventRequest": map[string]any{
 			"type":     "object",
 			"required": []string{"type", "title", "deadline"},
 			"properties": map[string]any{
-				"type":     map[string]any{"type": "string", "enum": []string{"match_score", "champion", "runner_up"}},
+				"type":     map[string]any{"type": "string", "enum": []string{"match_score", "champion", "runner_up", "third_place"}},
 				"title":    map[string]any{"type": "string", "example": "Brezilya vs Arjantin"},
 				"metadata": ref("EventMetadata"),
 				"deadline": map[string]any{"type": "string", "format": "date-time", "example": "2026-06-15T18:00:00Z"},
@@ -426,7 +426,7 @@ func buildSchemas() map[string]any {
 		},
 		"TeamResult": map[string]any{
 			"type":        "object",
-			"description": "champion ve runner_up eventleri için tek takım seçimi",
+			"description": "champion, runner_up ve third_place eventleri için tek takım seçimi",
 			"required":    []string{"team"},
 			"properties": map[string]any{
 				"team": map[string]any{"type": "string", "example": "Brazil"},
@@ -434,7 +434,7 @@ func buildSchemas() map[string]any {
 		},
 		"TeamChoice": map[string]any{
 			"type":        "object",
-			"description": "champion ve runner_up eventleri için tek takım tahmini",
+			"description": "champion, runner_up ve third_place eventleri için tek takım tahmini",
 			"required":    []string{"team"},
 			"properties": map[string]any{
 				"team": map[string]any{"type": "string", "example": "Brazil"},

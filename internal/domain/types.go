@@ -20,6 +20,7 @@ const (
 	EventTypeMatchScore EventType = "match_score"
 	EventTypeChampion   EventType = "champion"
 	EventTypeRunnerUp   EventType = "runner_up"
+	EventTypeThirdPlace EventType = "third_place"
 )
 
 type EventStatus string

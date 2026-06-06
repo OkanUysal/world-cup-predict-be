@@ -33,6 +33,20 @@ Health check: `GET /health`
 
 Swagger UI: `GET /swagger/` — server URL is detected automatically from the current host (localhost or Railway).
 
+## Seed WC2026 Events
+
+Load group-stage matches and placement events (champion, runner-up, third place):
+
+```bash
+go run ./cmd/seed
+```
+
+- 3 placement events — deadline: **2026-06-10T19:00:00Z** (1 day before opening match, GMT)
+- 72 group matches — deadline: **1 hour before kickoff** (all times stored in UTC/GMT)
+- All 48 participating nations included as team options for placement events
+
+Re-run with `-force` only on a fresh DB (will fail on duplicate titles otherwise).
+
 ## API Overview
 
 ### Auth (public)
@@ -62,6 +76,7 @@ Swagger UI: `GET /swagger/` — server URL is detected automatically from the cu
 | `match_score` | `{"home_score": 2, "away_score": 1}` | aynı format | 1 (sonuç) / 3 (tam skor) |
 | `champion` | `{"team": "Brazil"}` | `{"team": "Brazil"}` | 10 |
 | `runner_up` | `{"team": "Argentina"}` | `{"team": "Argentina"}` | 5 |
+| `third_place` | `{"team": "France"}` | `{"team": "France"}` | 3 |
 
 ## Prediction Examples
 
@@ -70,7 +85,7 @@ Swagger UI: `GET /swagger/` — server URL is detected automatically from the cu
 { "home_score": 2, "away_score": 1 }
 ```
 
-**Champion / runner_up choice (tek takım seçimi):**
+**Champion / runner_up / third_place choice (tek takım seçimi):**
 ```json
 { "team": "Brazil" }
 ```
