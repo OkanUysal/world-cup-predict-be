@@ -45,7 +45,7 @@ go run ./cmd/seed
 - 72 group matches — deadline: **1 hour before kickoff** (all times stored in UTC/GMT)
 - All 48 participating nations included as team options for placement events
 
-Re-run with `-force` only on a fresh DB (will fail on duplicate titles otherwise).
+Re-run with `-force` to replace existing WC2026 events (e.g. after team name updates).
 
 ## API Overview
 
@@ -74,9 +74,9 @@ Re-run with `-force` only on a fresh DB (will fail on duplicate titles otherwise
 | Event type | Tahmin (`choice`) | Sonuç (`result`) | Puan |
 |------------|-------------------|------------------|------|
 | `match_score` | `{"home_score": 2, "away_score": 1}` | aynı format | 1 (sonuç) / 3 (tam skor) |
-| `champion` | `{"team": "Brazil"}` | `{"team": "Brazil"}` | 10 |
-| `runner_up` | `{"team": "Argentina"}` | `{"team": "Argentina"}` | 5 |
-| `third_place` | `{"team": "France"}` | `{"team": "France"}` | 3 |
+| `champion` | `{"team": "Brezilya"}` | `{"team": "Brezilya"}` | 10 |
+| `runner_up` | `{"team": "Arjantin"}` | `{"team": "Arjantin"}` | 5 |
+| `third_place` | `{"team": "Fransa"}` | `{"team": "Fransa"}` | 3 |
 
 ## Prediction Examples
 
@@ -87,7 +87,7 @@ Re-run with `-force` only on a fresh DB (will fail on duplicate titles otherwise
 
 **Champion / runner_up / third_place choice (tek takım seçimi):**
 ```json
-{ "team": "Brazil" }
+{ "team": "Brezilya" }
 ```
 
 ## Railway Deployment

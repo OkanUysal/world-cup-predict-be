@@ -25,6 +25,11 @@ func (s *Seeder) Run(ctx context.Context, force bool) (int, error) {
 	if count > 0 && !force {
 		return 0, fmt.Errorf("WC2026 events already exist (%d). use -force to re-seed", count)
 	}
+	if count > 0 && force {
+		if err := s.events.DeleteByTitlePrefix(ctx, SeedTitlePrefix); err != nil {
+			return 0, fmt.Errorf("delete existing WC2026 events: %w", err)
+		}
+	}
 
 	teamsMetadata, err := json.Marshal(map[string]any{"teams": Teams})
 	if err != nil {

@@ -196,6 +196,16 @@ func (r *EventRepository) CountByTitlePrefix(ctx context.Context, prefix string)
 	return count, nil
 }
 
+func (r *EventRepository) DeleteByTitlePrefix(ctx context.Context, prefix string) error {
+	_, err := r.db.ExecContext(ctx, `
+		DELETE FROM events WHERE title LIKE $1
+	`, prefix+"%")
+	if err != nil {
+		return fmt.Errorf("delete events by prefix: %w", err)
+	}
+	return nil
+}
+
 func (r *EventRepository) RefreshStatus(ctx context.Context, e *domain.Event) {
 	if e.Status == domain.EventStatusOpen && !time.Now().Before(e.Deadline) {
 		e.Status = domain.EventStatusLocked

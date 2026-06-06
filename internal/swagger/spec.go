@@ -379,7 +379,7 @@ func buildSchemas() map[string]any {
 		"EventMetadata": map[string]any{
 			"type":        "object",
 			"description": "match_score: {home_team, away_team} | champion/runner_up/third_place: {teams: [...]}",
-			"example":     map[string]any{"home_team": "Brazil", "away_team": "Argentina"},
+			"example":     map[string]any{"home_team": "Brezilya", "away_team": "Arjantin"},
 		},
 		"CreateEventRequest": map[string]any{
 			"type":     "object",
@@ -429,7 +429,7 @@ func buildSchemas() map[string]any {
 			"description": "champion, runner_up ve third_place eventleri için tek takım seçimi",
 			"required":    []string{"team"},
 			"properties": map[string]any{
-				"team": map[string]any{"type": "string", "example": "Brazil"},
+				"team": map[string]any{"type": "string", "example": "Brezilya"},
 			},
 		},
 		"TeamChoice": map[string]any{
@@ -437,7 +437,7 @@ func buildSchemas() map[string]any {
 			"description": "champion, runner_up ve third_place eventleri için tek takım tahmini",
 			"required":    []string{"team"},
 			"properties": map[string]any{
-				"team": map[string]any{"type": "string", "example": "Brazil"},
+				"team": map[string]any{"type": "string", "example": "Brezilya"},
 			},
 		},
 		"PredictionRequest": map[string]any{
