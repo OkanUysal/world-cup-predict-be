@@ -33,6 +33,8 @@ Health check: `GET /health`
 
 Swagger UI: `GET /swagger/` — server URL is detected automatically from the current host (localhost or Railway).
 
+User API DTO & response dokümantasyonu: [`docs/user-api.md`](docs/user-api.md)
+
 ## Seed WC2026 Events
 
 Load group-stage matches and placement events (champion, runner-up, third place):
@@ -67,7 +69,8 @@ Re-run with `-force` to replace existing WC2026 events (e.g. after team name upd
 - `POST /api/v1/admin/events` — `{ "type", "title", "metadata", "deadline" }`
 - `PATCH /api/v1/admin/events/{id}`
 - `POST /api/v1/admin/events/{id}/result` — `{ "result": {...} }`
-- `POST /api/v1/admin/events/{id}/calculate-scores`
+- `POST /api/v1/admin/events/calculate-scores` — sonucu girilmiş tüm eventlerin puanlarını hesapla
+- `POST /api/v1/admin/events/{id}/calculate-scores` — tek event puan hesapla
 
 ## Scoring Rules
 

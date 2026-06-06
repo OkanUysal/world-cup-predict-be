@@ -67,6 +67,7 @@ func NewRouter(h *Handlers, tokenService *auth.TokenService) http.Handler {
 
 				r.Route("/events", func(r chi.Router) {
 					r.Post("/", h.AdminEvent.Create)
+					r.Post("/calculate-scores", h.AdminEvent.CalculateAllScores)
 					r.Patch("/{id}", h.AdminEvent.Update)
 					r.Post("/{id}/result", h.AdminEvent.SetResult)
 					r.Post("/{id}/calculate-scores", h.AdminEvent.CalculateScores)

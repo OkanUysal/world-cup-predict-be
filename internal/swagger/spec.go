@@ -275,10 +275,24 @@ func buildPaths() map[string]any {
 				},
 			},
 		},
+		"/api/v1/admin/events/calculate-scores": map[string]any{
+			"post": map[string]any{
+				"tags":        []string{"Admin Events"},
+				"summary":     "Tüm sonuçlanmış eventlerin puanlarını hesapla",
+				"description": "Sonucu girilmiş ama henüz puanlanmamış tüm eventleri işler ve leaderboard'u günceller.",
+				"operationId": "adminCalculateAllScores",
+				"security":    bearer(),
+				"responses": map[string]any{
+					"200": jsonResponse("Puanlar hesaplandı", ref("CalculateAllScoresResult")),
+					"401": errorResponse("Yetkisiz"),
+					"403": errorResponse("Admin gerekli"),
+				},
+			},
+		},
 		"/api/v1/admin/events/{id}/calculate-scores": map[string]any{
 			"post": map[string]any{
 				"tags":        []string{"Admin Events"},
-				"summary":     "Puan hesapla",
+				"summary":     "Tek event puan hesapla",
 				"description": "Event sonucuna göre tahmin puanlarını hesaplar ve event'i completed yapar.",
 				"operationId": "adminCalculateScores",
 				"security":    bearer(),
@@ -474,6 +488,13 @@ func buildSchemas() map[string]any {
 			"properties": map[string]any{
 				"event":         ref("Event"),
 				"my_prediction": map[string]any{"allOf": []any{ref("Prediction")}, "nullable": true},
+			},
+		},
+		"CalculateAllScoresResult": map[string]any{
+			"type": "object",
+			"properties": map[string]any{
+				"processed_count": map[string]any{"type": "integer", "example": 5},
+				"events":          arrayRef("Event"),
 			},
 		},
 		"UserScore": map[string]any{

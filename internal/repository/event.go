@@ -185,6 +185,29 @@ func (r *EventRepository) List(ctx context.Context, filter domain.EventListFilte
 	return events, rows.Err()
 }
 
+func (r *EventRepository) ListReadyForScoring(ctx context.Context) ([]domain.Event, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT id, type, title, metadata, deadline, status, result, created_at
+		FROM events
+		WHERE result IS NOT NULL AND status != 'completed'
+		ORDER BY deadline ASC
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("list events ready for scoring: %w", err)
+	}
+	defer rows.Close()
+
+	var events []domain.Event
+	for rows.Next() {
+		e, err := scanEvent(rows)
+		if err != nil {
+			return nil, fmt.Errorf("scan event: %w", err)
+		}
+		events = append(events, *e)
+	}
+	return events, rows.Err()
+}
+
 func (r *EventRepository) CountByTitlePrefix(ctx context.Context, prefix string) (int, error) {
 	var count int
 	err := r.db.QueryRowContext(ctx, `

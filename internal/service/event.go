@@ -82,38 +82,83 @@ func (s *EventService) CalculateScores(ctx context.Context, id uuid.UUID) (*doma
 	if err != nil {
 		return nil, err
 	}
-	s.events.RefreshStatus(ctx, event)
-
-	if event.Status == domain.EventStatusCompleted {
-		return nil, ErrAlreadyScored
-	}
-	if len(event.Result) == 0 {
-		return nil, ErrResultRequired
-	}
-
-	predictions, err := s.predictions.ListByEventID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, p := range predictions {
-		points, err := scoring.CalculatePoints(event.Type, p.Choice, event.Result)
-		if err != nil {
-			return nil, fmt.Errorf("score prediction %s: %w", p.ID, err)
-		}
-		if err := s.predictions.UpdatePoints(ctx, p.ID, points); err != nil {
-			return nil, err
-		}
-	}
-
-	if err := s.events.MarkCompleted(ctx, id); err != nil {
+	if err := s.scoreEvent(ctx, event); err != nil {
 		return nil, err
 	}
 	if err := s.scores.RecalculateAll(ctx); err != nil {
 		return nil, err
 	}
-
 	return s.events.GetByID(ctx, id)
+}
+
+type CalculateAllScoresResult struct {
+	ProcessedCount int            `json:"processed_count"`
+	Events         []domain.Event `json:"events"`
+}
+
+func (s *EventService) CalculateAllScores(ctx context.Context) (*CalculateAllScoresResult, error) {
+	if err := s.SyncStatuses(ctx); err != nil {
+		return nil, err
+	}
+
+	events, err := s.events.ListReadyForScoring(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &CalculateAllScoresResult{
+		Events: make([]domain.Event, 0, len(events)),
+	}
+
+	for i := range events {
+		e := &events[i]
+		s.events.RefreshStatus(ctx, e)
+		if err := s.scoreEvent(ctx, e); err != nil {
+			return nil, fmt.Errorf("score event %s (%s): %w", e.ID, e.Title, err)
+		}
+		completed, err := s.events.GetByID(ctx, e.ID)
+		if err != nil {
+			return nil, err
+		}
+		result.Events = append(result.Events, *completed)
+		result.ProcessedCount++
+	}
+
+	if result.ProcessedCount > 0 {
+		if err := s.scores.RecalculateAll(ctx); err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
+}
+
+func (s *EventService) scoreEvent(ctx context.Context, event *domain.Event) error {
+	s.events.RefreshStatus(ctx, event)
+
+	if event.Status == domain.EventStatusCompleted {
+		return ErrAlreadyScored
+	}
+	if len(event.Result) == 0 {
+		return ErrResultRequired
+	}
+
+	predictions, err := s.predictions.ListByEventID(ctx, event.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range predictions {
+		points, err := scoring.CalculatePoints(event.Type, p.Choice, event.Result)
+		if err != nil {
+			return fmt.Errorf("score prediction %s: %w", p.ID, err)
+		}
+		if err := s.predictions.UpdatePoints(ctx, p.ID, points); err != nil {
+			return err
+		}
+	}
+
+	return s.events.MarkCompleted(ctx, event.ID)
 }
 
 func (s *EventService) Get(ctx context.Context, id uuid.UUID, userID uuid.UUID) (*domain.Event, *domain.Prediction, error) {

@@ -108,6 +108,16 @@ func (h *AdminEventHandler) SetResult(w http.ResponseWriter, r *http.Request) {
 	httputil.WriteJSON(w, http.StatusOK, event)
 }
 
+func (h *AdminEventHandler) CalculateAllScores(w http.ResponseWriter, r *http.Request) {
+	result, err := h.events.CalculateAllScores(r.Context())
+	if err != nil {
+		httputil.WriteError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	httputil.WriteJSON(w, http.StatusOK, result)
+}
+
 func (h *AdminEventHandler) CalculateScores(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
