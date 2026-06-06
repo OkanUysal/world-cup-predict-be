@@ -1,0 +1,8 @@
+/server
+/server.exe
+/world-cup-predict-be
+/world-cup-predict-be.exe
+*.exe
+.env
+.env.*
+!.env.example
