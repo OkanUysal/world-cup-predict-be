@@ -53,7 +53,7 @@ func (r *ScoreRepository) RecalculateAll(ctx context.Context) error {
 func (r *ScoreRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*domain.UserScore, error) {
 	s := &domain.UserScore{}
 	err := r.db.QueryRowContext(ctx, `
-		SELECT us.user_id, u.name, us.channel_id, us.total_points, us.updated_at
+		SELECT us.user_id, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name), us.channel_id, us.total_points, us.updated_at
 		FROM user_scores us
 		JOIN world_cup_users u ON u.id = us.user_id
 		WHERE us.user_id = $1
@@ -66,11 +66,11 @@ func (r *ScoreRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*d
 
 func (r *ScoreRepository) Leaderboard(ctx context.Context, channelID uuid.UUID) ([]domain.UserScore, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT us.user_id, u.name, us.channel_id, us.total_points, us.updated_at
+		SELECT us.user_id, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name), us.channel_id, us.total_points, us.updated_at
 		FROM user_scores us
 		JOIN world_cup_users u ON u.id = us.user_id
 		WHERE us.channel_id = $1
-		ORDER BY us.total_points DESC, u.name ASC
+		ORDER BY us.total_points DESC, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name) ASC
 	`, channelID)
 	if err != nil {
 		return nil, fmt.Errorf("leaderboard: %w", err)

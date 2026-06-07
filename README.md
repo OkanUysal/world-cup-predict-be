@@ -57,6 +57,7 @@ Re-run with `-force` to replace existing WC2026 events (e.g. after team name upd
 
 ### User (Bearer token)
 - `GET /api/v1/me`
+- `PATCH /api/v1/me/nickname` — görünen isim güncelle
 - `GET /api/v1/leaderboard`
 - `GET /api/v1/events?status=open|locked|pending|completed`
 - `GET /api/v1/events/{id}`

@@ -113,11 +113,26 @@ func buildPaths() map[string]any {
 				},
 			},
 		},
+		"/api/v1/me/nickname": map[string]any{
+			"patch": map[string]any{
+				"tags":        []string{"User"},
+				"summary":     "Nickname güncelle",
+				"description": "Boş string gönderilirse nickname temizlenir; görüntülemede name kullanılır.",
+				"operationId": "updateNickname",
+				"security":    bearer(),
+				"requestBody": jsonBody(ref("UpdateNicknameRequest"), "Yeni nickname"),
+				"responses": map[string]any{
+					"200": jsonResponse("Güncellenmiş profil", ref("UserProfile")),
+					"400": errorResponse("Geçersiz nickname"),
+					"401": errorResponse("Yetkisiz"),
+				},
+			},
+		},
 		"/api/v1/leaderboard": map[string]any{
 			"get": map[string]any{
 				"tags":        []string{"User"},
 				"summary":     "Channel sıralaması",
-				"description": "Kullanıcının channel'ındaki puan sıralaması.",
+				"description": "Kullanıcının channel'ındaki puan sıralaması. user_name alanı nickname veya name gösterir.",
 				"operationId": "getLeaderboard",
 				"security":    bearer(),
 				"responses": map[string]any{
@@ -350,15 +365,24 @@ func buildSchemas() map[string]any {
 				"user":         ref("UserProfile"),
 			},
 		},
+		"UpdateNicknameRequest": map[string]any{
+			"type":     "object",
+			"required": []string{"nickname"},
+			"properties": map[string]any{
+				"nickname": map[string]any{"type": "string", "example": "AhmetGK", "description": "Boş string ile temizlenir"},
+			},
+		},
 		"UserProfile": map[string]any{
 			"type": "object",
 			"properties": map[string]any{
-				"id":           map[string]any{"type": "string", "format": "uuid"},
-				"name":         map[string]any{"type": "string"},
-				"role":         map[string]any{"type": "string", "enum": []string{"user", "admin"}},
-				"channel_id":   map[string]any{"type": "string", "format": "uuid", "nullable": true},
-				"channel":      map[string]any{"allOf": []any{ref("ChannelSummary")}, "nullable": true},
-				"total_points": map[string]any{"type": "integer", "nullable": true},
+				"id":            map[string]any{"type": "string", "format": "uuid"},
+				"name":          map[string]any{"type": "string", "description": "Giriş kullanıcı adı"},
+				"nickname":      map[string]any{"type": "string", "description": "Görünen isim (opsiyonel)"},
+				"display_name":  map[string]any{"type": "string", "description": "nickname varsa nickname, yoksa name"},
+				"role":          map[string]any{"type": "string", "enum": []string{"user", "admin"}},
+				"channel_id":    map[string]any{"type": "string", "format": "uuid", "nullable": true},
+				"channel":       map[string]any{"allOf": []any{ref("ChannelSummary")}, "nullable": true},
+				"total_points":  map[string]any{"type": "integer", "nullable": true},
 			},
 		},
 		"ChannelSummary": map[string]any{

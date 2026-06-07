@@ -36,12 +36,14 @@ type AuthResponse struct {
 }
 
 type UserProfile struct {
-	ID          string           `json:"id"`
-	Name        string           `json:"name"`
-	Role        domain.Role      `json:"role"`
-	ChannelID   *string          `json:"channel_id,omitempty"`
-	Channel     *ChannelSummary  `json:"channel,omitempty"`
-	TotalPoints *int             `json:"total_points,omitempty"`
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Nickname    string          `json:"nickname,omitempty"`
+	DisplayName string          `json:"display_name"`
+	Role        domain.Role     `json:"role"`
+	ChannelID   *string         `json:"channel_id,omitempty"`
+	Channel     *ChannelSummary `json:"channel,omitempty"`
+	TotalPoints *int            `json:"total_points,omitempty"`
 }
 
 type ChannelSummary struct {
@@ -168,6 +170,8 @@ func toUserProfile(user *domain.User, totalPoints *int) UserProfile {
 	profile := UserProfile{
 		ID:          user.ID.String(),
 		Name:        user.Name,
+		Nickname:    user.Nickname,
+		DisplayName: domain.DisplayName(user.Name, user.Nickname),
 		Role:        user.Role,
 		TotalPoints: totalPoints,
 	}

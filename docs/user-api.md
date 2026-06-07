@@ -35,7 +35,9 @@ Hata durumlarında dönen standart yapı:
 | Alan | Tip | Zorunlu | Açıklama |
 |------|-----|---------|----------|
 | `id` | string (uuid) | Evet | Kullanıcı ID |
-| `name` | string | Evet | Kullanıcı adı |
+| `name` | string | Evet | Giriş kullanıcı adı (değişmez) |
+| `nickname` | string | Hayır | Görünen isim (boş olabilir) |
+| `display_name` | string | Evet | `nickname` doluysa nickname, değilse `name` |
 | `role` | string | Evet | `user` veya `admin` |
 | `channel_id` | string (uuid) | Hayır | Kullanıcının channel ID'si |
 | `channel` | ChannelSummary | Hayır | Kanal bilgisi (sadece `/me`) |
@@ -77,7 +79,7 @@ Hata durumlarında dönen standart yapı:
 | `id` | string (uuid) | Evet | Tahmin ID |
 | `event_id` | string (uuid) | Evet | Event ID |
 | `user_id` | string (uuid) | Evet | Kullanıcı ID |
-| `user_name` | string | Hayır | Kullanıcı adı (channel tahmin listesinde) |
+| `user_name` | string | Hayır | Görünen isim: nickname veya name |
 | `choice` | object | Evet | Tahmin içeriği (event tipine göre) |
 | `points_awarded` | integer | Evet | Kazanılan puan |
 | `created_at` | string (datetime) | Evet | Oluşturulma (UTC) |
@@ -88,7 +90,7 @@ Hata durumlarında dönen standart yapı:
 | Alan | Tip | Zorunlu | Açıklama |
 |------|-----|---------|----------|
 | `user_id` | string (uuid) | Evet | Kullanıcı ID |
-| `user_name` | string | Evet | Kullanıcı adı |
+| `user_name` | string | Evet | Görünen isim: nickname veya name |
 | `channel_id` | string (uuid) | Evet | Channel ID |
 | `total_points` | integer | Evet | Toplam puan |
 | `updated_at` | string (datetime) | Evet | Son güncelleme (UTC) |
@@ -242,6 +244,8 @@ Giriş yapmış kullanıcının profil ve puan bilgisi.
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "ahmet",
+  "nickname": "AhmetGK",
+  "display_name": "AhmetGK",
   "role": "user",
   "channel_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
   "channel": {
@@ -261,9 +265,36 @@ Giriş yapmış kullanıcının profil ve puan bilgisi.
 
 ---
 
+### PATCH `/me/nickname`
+
+Kullanıcının görünen ismini (nickname) günceller. Boş string gönderilirse nickname temizlenir.
+
+**Request DTO**
+
+| Alan | Tip | Zorunlu | Açıklama |
+|------|-----|---------|----------|
+| `nickname` | string | Evet | 2–64 karakter; `""` ile temizlenir |
+
+```json
+{
+  "nickname": "AhmetGK"
+}
+```
+
+**Response `200 OK` — UserProfile** (güncellenmiş profil)
+
+**Hatalar**
+
+| HTTP | error |
+|------|-------|
+| 400 | `invalid request body` / validasyon mesajı |
+| 401 | `unauthorized` |
+
+---
+
 ### GET `/leaderboard`
 
-Kullanıcının channel'ındaki puan sıralaması.
+Kullanıcının channel'ındaki puan sıralaması. `user_name` alanı nickname varsa nickname, yoksa giriş adını (`name`) gösterir.
 
 **Request:** Body yok.
 

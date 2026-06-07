@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/OkanUysal/world-cup-predict-be/internal/domain"
 	"github.com/OkanUysal/world-cup-predict-be/internal/repository"
@@ -53,4 +55,31 @@ func (s *ScoreService) GetUserProfile(ctx context.Context, userID uuid.UUID) (*U
 	profile := toUserProfile(user, totalPoints)
 	profile.Channel = channelSummary
 	return &profile, nil
+}
+
+func (s *ScoreService) UpdateNickname(ctx context.Context, userID uuid.UUID, nickname string) (*UserProfile, error) {
+	nickname = strings.TrimSpace(nickname)
+	if err := validateNickname(nickname); err != nil {
+		return nil, err
+	}
+
+	user, err := s.users.UpdateNickname(ctx, userID, nickname)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.GetUserProfile(ctx, user.ID)
+}
+
+func validateNickname(nickname string) error {
+	if nickname == "" {
+		return nil
+	}
+	if len(nickname) < 2 {
+		return fmt.Errorf("nickname must be at least 2 characters")
+	}
+	if len(nickname) > 64 {
+		return fmt.Errorf("nickname must be at most 64 characters")
+	}
+	return nil
 }

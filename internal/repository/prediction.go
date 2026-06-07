@@ -56,11 +56,13 @@ func (r *PredictionRepository) GetByEventAndUser(ctx context.Context, eventID, u
 
 func (r *PredictionRepository) ListByEventAndChannel(ctx context.Context, eventID, channelID uuid.UUID) ([]domain.Prediction, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT p.id, p.event_id, p.user_id, u.name, p.choice, p.points_awarded, p.created_at, p.updated_at
+		SELECT p.id, p.event_id, p.user_id,
+			COALESCE(NULLIF(TRIM(u.nickname), ''), u.name),
+			p.choice, p.points_awarded, p.created_at, p.updated_at
 		FROM predictions p
 		JOIN world_cup_users u ON u.id = p.user_id
 		WHERE p.event_id = $1 AND u.channel_id = $2
-		ORDER BY u.name ASC
+		ORDER BY COALESCE(NULLIF(TRIM(u.nickname), ''), u.name) ASC
 	`, eventID, channelID)
 	if err != nil {
 		return nil, fmt.Errorf("list predictions: %w", err)

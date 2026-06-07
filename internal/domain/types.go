@@ -42,6 +42,7 @@ type User struct {
 	ID           uuid.UUID `json:"id"`
 	ChannelID    uuid.UUID `json:"channel_id"`
 	Name         string    `json:"name"`
+	Nickname     string    `json:"nickname,omitempty"`
 	PasswordHash string    `json:"-"`
 	Role         Role      `json:"role"`
 	CreatedAt    time.Time `json:"created_at"`
