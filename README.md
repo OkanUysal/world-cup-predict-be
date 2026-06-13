@@ -75,12 +75,17 @@ Re-run with `-force` to replace existing WC2026 events (e.g. after team name upd
 
 ## Scoring Rules
 
-| Event type | Tahmin (`choice`) | Sonuç (`result`) | Puan |
-|------------|-------------------|------------------|------|
-| `match_score` | `{"home_score": 2, "away_score": 1}` | aynı format | 1 (sonuç) / 3 (tam skor) |
-| `champion` | `{"team": "Brezilya"}` | `{"team": "Brezilya"}` | 10 |
-| `runner_up` | `{"team": "Arjantin"}` | `{"team": "Arjantin"}` | 5 |
-| `third_place` | `{"team": "Fransa"}` | `{"team": "Fransa"}` | 3 |
+Detaylı kurallar: [`docs/scoring-rules.md`](docs/scoring-rules.md)
+
+| Event type | Puan |
+|------------|------|
+| `match_score` — kazanan/beraberlik | 1 |
+| `match_score` — tam skor | 3 |
+| `champion` | 10 |
+| `runner_up` | 5 |
+| `third_place` | 3 |
+
+Eleme maçlarında skor **uzatmalar dahil**, **penaltılar hariç** girilir.
 
 ## Prediction Examples
 

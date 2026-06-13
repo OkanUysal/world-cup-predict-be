@@ -332,7 +332,7 @@ Sıralama: `total_points` azalan, eşitlikte `user_name` artan.
 
 ### GET `/events`
 
-Event listesi. Deadline'a göre artan sıralı.
+Event listesi. `open`: deadline en yakın üstte. `pending`, `locked`, `completed`: deadline en geç üstte.
 
 **Query parametreleri**
 
@@ -551,10 +551,12 @@ Aynı channel'daki tüm kullanıcıların tahminleri. **Deadline geçtikten sonr
 
 ## Puanlama Kuralları
 
+Detaylı kurallar: [`scoring-rules.md`](scoring-rules.md)
+
 | Event type | Doğru tahmin | Puan |
 |------------|--------------|------|
 | `match_score` | Kazanan / beraberlik | 1 |
-| `match_score` | Tam skor | 3 |
+| `match_score` | Tam skor (uzatma dahil, penaltı hariç) | 3 |
 | `champion` | Doğru takım | 10 |
 | `runner_up` | Doğru takım | 5 |
 | `third_place` | Doğru takım | 3 |

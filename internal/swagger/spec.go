@@ -146,7 +146,7 @@ func buildPaths() map[string]any {
 			"get": map[string]any{
 				"tags":        []string{"Events"},
 				"summary":     "Event listesi",
-				"description": "Deadline'a göre sıralı event listesi. pending = deadline geçmiş, sonuç bekleyen.",
+				"description": "open: deadline en yakın üstte. pending/locked/completed: deadline en geç üstte.",
 				"operationId": "listEvents",
 				"security":    bearer(),
 				"parameters": []map[string]any{

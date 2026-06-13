@@ -157,16 +157,14 @@ func (r *EventRepository) List(ctx context.Context, filter domain.EventListFilte
 
 	switch filter {
 	case domain.EventFilterOpen:
-		query += ` WHERE status = 'open' AND deadline > NOW()`
+		query += ` WHERE status = 'open' AND deadline > NOW() ORDER BY deadline ASC`
 	case domain.EventFilterLocked:
-		query += ` WHERE status = 'locked'`
+		query += ` WHERE status = 'locked' ORDER BY deadline DESC`
 	case domain.EventFilterPending:
-		query += ` WHERE status = 'locked' AND result IS NULL`
+		query += ` WHERE status = 'locked' AND result IS NULL ORDER BY deadline DESC`
 	case domain.EventFilterCompleted:
-		query += ` WHERE status = 'completed'`
+		query += ` WHERE status = 'completed' ORDER BY deadline DESC`
 	}
-
-	query += ` ORDER BY deadline ASC`
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
