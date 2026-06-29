@@ -50,6 +50,7 @@ func NewRouter(h *Handlers, tokenService *auth.TokenService) http.Handler {
 			r.Get("/me", h.Me.Get)
 			r.Patch("/me/nickname", h.Me.UpdateNickname)
 			r.Get("/leaderboard", h.Event.Leaderboard)
+			r.Get("/users/{id}/predictions", h.Event.ListUserPredictions)
 
 			r.Route("/events", func(r chi.Router) {
 				r.Get("/", h.Event.List)

@@ -142,6 +142,31 @@ func buildPaths() map[string]any {
 				},
 			},
 		},
+		"/api/v1/users/{id}/predictions": map[string]any{
+			"get": map[string]any{
+				"tags":        []string{"User"},
+				"summary":     "Kullanıcı tahmin listesi",
+				"description": "Belirli bir kullanıcının tahminlerini listeler. Süresi geçmemiş açık tahminlerin içeriği gizlenir.",
+				"operationId": "getUserPredictions",
+				"security":    bearer(),
+				"parameters": []map[string]any{
+					{
+						"name":        "id",
+						"in":          "path",
+						"required":    true,
+						"schema":      map[string]any{"type": "string", "format": "uuid"},
+						"description": "Kullanıcı ID'si",
+					},
+				},
+				"responses": map[string]any{
+					"200": jsonResponse("Kullanıcı tahminleri", arrayRef("EventWithPrediction")),
+					"400": errorResponse("Geçersiz kullanıcı ID'si"),
+					"401": errorResponse("Yetkisiz"),
+					"403": errorResponse("Kanal üyeliği gerekli veya farklı kanal"),
+					"404": errorResponse("Kullanıcı bulunamadı"),
+				},
+			},
+		},
 		"/api/v1/events": map[string]any{
 			"get": map[string]any{
 				"tags":        []string{"Events"},

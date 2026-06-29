@@ -71,6 +71,10 @@ func (s *ScoreService) UpdateNickname(ctx context.Context, userID uuid.UUID, nic
 	return s.GetUserProfile(ctx, user.ID)
 }
 
+func (s *ScoreService) GetUser(ctx context.Context, userID uuid.UUID) (*domain.User, error) {
+	return s.users.GetByID(ctx, userID)
+}
+
 func validateNickname(nickname string) error {
 	if nickname == "" {
 		return nil

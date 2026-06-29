@@ -255,6 +255,33 @@ func (s *EventService) ListPredictions(ctx context.Context, eventID, channelID u
 	return s.predictions.ListByEventAndChannel(ctx, eventID, channelID)
 }
 
+func (s *EventService) ListUserPredictions(ctx context.Context, targetUserID, requestingUserID uuid.UUID) ([]EventWithPrediction, error) {
+	if err := s.SyncStatuses(ctx); err != nil {
+		return nil, err
+	}
+
+	events, err := s.events.List(ctx, "") // Get all events
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]EventWithPrediction, 0, len(events))
+	for _, e := range rangeEvents(events) {
+		s.events.RefreshStatus(ctx, &e)
+		item := EventWithPrediction{Event: e}
+		p, err := s.predictions.GetByEventAndUser(ctx, e.ID, targetUserID)
+		if err == nil {
+			// Redact prediction details if deadline hasn't passed and the requester is another user
+			if requestingUserID != targetUserID && e.Status == domain.EventStatusOpen && time.Now().Before(e.Deadline) {
+				p.Choice = json.RawMessage("null")
+			}
+			item.MyPrediction = p
+		}
+		result = append(result, item)
+	}
+	return result, nil
+}
+
 func validateChoice(eventType domain.EventType, choice json.RawMessage) error {
 	switch eventType {
 	case domain.EventTypeMatchScore:

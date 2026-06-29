@@ -334,6 +334,54 @@ Sıralama: `total_points` azalan, eşitlikte `user_name` artan.
 
 ---
 
+### GET `/users/{id}/predictions`
+
+Belirli bir kullanıcının tahmin listesi ve tahmin sonuçları. İstek atan kullanıcı ile hedef kullanıcı aynı kanalda (channel) olmak zorundadır.
+
+**Kopya Tahmin Koruması:** Eğer maça/event'e ait süre henüz dolmadıysa (deadline geçmediyse) ve istek atan kullanıcı hedef kullanıcının kendisi değilse, tahmin detayındaki `choice` alanı `null` olarak maskelenir.
+
+**Request:** Query parametresi yok.
+
+**Response `200 OK` — EventWithPrediction[]**
+
+```json
+[
+  {
+    "event": {
+      "id": "1b0e8400-e29b-41d4-a716-446655440000",
+      "type": "match_score",
+      "title": "Arjantin - Fransa",
+      "metadata": { "home_team": "Arjantin", "away_team": "Fransa" },
+      "deadline": "2026-06-18T18:00:00Z",
+      "status": "completed",
+      "result": { "home_score": 3, "away_score": 3 },
+      "created_at": "2026-06-11T12:00:00Z"
+    },
+    "my_prediction": {
+      "id": "2b0e8400-e29b-41d4-a716-446655440001",
+      "event_id": "1b0e8400-e29b-41d4-a716-446655440000",
+      "user_id": "660e8400-e29b-41d4-a716-446655440001",
+      "user_name": "mehmet",
+      "choice": { "home_score": 2, "away_score": 2 },
+      "points_awarded": 1,
+      "created_at": "2026-06-12T15:00:00Z",
+      "updated_at": "2026-06-12T15:00:00Z"
+    }
+  }
+]
+```
+
+**Hatalar**
+
+| HTTP | error | Neden |
+|------|-------|-------|
+| 400 | `invalid user id` | Geçersiz UUID formatı |
+| 401 | `unauthorized` | Token yok veya geçersiz |
+| 403 | `channel membership required` / `user belongs to a different channel` | İstek atan kullanıcının kanalı yok veya hedef kullanıcı ile kanalları uyuşmuyor |
+| 404 | `user not found` | Hedef kullanıcı bulunamadı |
+
+---
+
 ### GET `/events`
 
 Event listesi. `open`: deadline en yakın üstte. `pending`, `locked`, `completed`: deadline en geç üstte.

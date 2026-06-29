@@ -316,3 +316,49 @@ func (h *EventHandler) Leaderboard(w http.ResponseWriter, r *http.Request) {
 
 	httputil.WriteJSON(w, http.StatusOK, scores)
 }
+
+func (h *EventHandler) ListUserPredictions(w http.ResponseWriter, r *http.Request) {
+	claims, ok := middleware.GetClaims(r)
+	if !ok {
+		httputil.WriteError(w, http.StatusUnauthorized, "unauthorized")
+		return
+	}
+
+	if claims.ChannelID == uuid.Nil {
+		httputil.WriteError(w, http.StatusForbidden, "channel membership required")
+		return
+	}
+
+	targetUserID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		httputil.WriteError(w, http.StatusBadRequest, "invalid user id")
+		return
+	}
+
+	targetUser, err := h.scores.GetUser(r.Context(), targetUserID)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			httputil.WriteError(w, http.StatusNotFound, "user not found")
+		} else {
+			httputil.WriteError(w, http.StatusInternalServerError, "failed to fetch user details")
+		}
+		return
+	}
+
+	if targetUser.ChannelID != claims.ChannelID {
+		httputil.WriteError(w, http.StatusForbidden, "user belongs to a different channel")
+		return
+	}
+
+	predictions, err := h.events.ListUserPredictions(r.Context(), targetUserID, claims.UserID)
+	if err != nil {
+		httputil.WriteError(w, http.StatusInternalServerError, "failed to load user predictions")
+		return
+	}
+
+	if predictions == nil {
+		predictions = []service.EventWithPrediction{}
+	}
+
+	httputil.WriteJSON(w, http.StatusOK, predictions)
+}
