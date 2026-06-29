@@ -307,6 +307,8 @@ Kullanıcının channel'ındaki puan sıralaması. `user_name` alanı nickname v
     "user_name": "ahmet",
     "channel_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
     "total_points": 15,
+    "exact_score_count": 5,
+    "correct_outcome_count": 10,
     "updated_at": "2026-06-11T22:00:00Z"
   },
   {
@@ -314,6 +316,8 @@ Kullanıcının channel'ındaki puan sıralaması. `user_name` alanı nickname v
     "user_name": "mehmet",
     "channel_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
     "total_points": 12,
+    "exact_score_count": 3,
+    "correct_outcome_count": 9,
     "updated_at": "2026-06-11T22:00:00Z"
   }
 ]

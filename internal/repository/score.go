@@ -53,11 +53,21 @@ func (r *ScoreRepository) RecalculateAll(ctx context.Context) error {
 func (r *ScoreRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*domain.UserScore, error) {
 	s := &domain.UserScore{}
 	err := r.db.QueryRowContext(ctx, `
-		SELECT us.user_id, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name), us.channel_id, us.total_points, us.updated_at
+		SELECT 
+			us.user_id, 
+			COALESCE(NULLIF(TRIM(u.nickname), ''), u.name), 
+			us.channel_id, 
+			us.total_points,
+			COALESCE(COUNT(p.id) FILTER (WHERE e.type = 'match_score' AND p.points_awarded = 3), 0) AS exact_score_count,
+			COALESCE(COUNT(p.id) FILTER (WHERE e.type = 'match_score' AND p.points_awarded = 1), 0) AS correct_outcome_count,
+			us.updated_at
 		FROM user_scores us
 		JOIN world_cup_users u ON u.id = us.user_id
+		LEFT JOIN predictions p ON p.user_id = us.user_id
+		LEFT JOIN events e ON e.id = p.event_id
 		WHERE us.user_id = $1
-	`, userID).Scan(&s.UserID, &s.UserName, &s.ChannelID, &s.TotalPoints, &s.UpdatedAt)
+		GROUP BY us.user_id, u.nickname, u.name, us.channel_id, us.total_points, us.updated_at
+	`, userID).Scan(&s.UserID, &s.UserName, &s.ChannelID, &s.TotalPoints, &s.ExactScoreCount, &s.CorrectOutcomeCount, &s.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("get user score: %w", err)
 	}
@@ -66,11 +76,21 @@ func (r *ScoreRepository) GetByUserID(ctx context.Context, userID uuid.UUID) (*d
 
 func (r *ScoreRepository) Leaderboard(ctx context.Context, channelID uuid.UUID) ([]domain.UserScore, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT us.user_id, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name), us.channel_id, us.total_points, us.updated_at
+		SELECT 
+			us.user_id, 
+			COALESCE(NULLIF(TRIM(u.nickname), ''), u.name) AS user_name, 
+			us.channel_id, 
+			us.total_points,
+			COALESCE(COUNT(p.id) FILTER (WHERE e.type = 'match_score' AND p.points_awarded = 3), 0) AS exact_score_count,
+			COALESCE(COUNT(p.id) FILTER (WHERE e.type = 'match_score' AND p.points_awarded = 1), 0) AS correct_outcome_count,
+			us.updated_at
 		FROM user_scores us
 		JOIN world_cup_users u ON u.id = us.user_id
+		LEFT JOIN predictions p ON p.user_id = us.user_id
+		LEFT JOIN events e ON e.id = p.event_id
 		WHERE us.channel_id = $1
-		ORDER BY us.total_points DESC, COALESCE(NULLIF(TRIM(u.nickname), ''), u.name) ASC
+		GROUP BY us.user_id, u.nickname, u.name, us.channel_id, us.total_points, us.updated_at
+		ORDER BY us.total_points DESC, user_name ASC
 	`, channelID)
 	if err != nil {
 		return nil, fmt.Errorf("leaderboard: %w", err)
@@ -80,7 +100,7 @@ func (r *ScoreRepository) Leaderboard(ctx context.Context, channelID uuid.UUID) 
 	var scores []domain.UserScore
 	for rows.Next() {
 		var s domain.UserScore
-		if err := rows.Scan(&s.UserID, &s.UserName, &s.ChannelID, &s.TotalPoints, &s.UpdatedAt); err != nil {
+		if err := rows.Scan(&s.UserID, &s.UserName, &s.ChannelID, &s.TotalPoints, &s.ExactScoreCount, &s.CorrectOutcomeCount, &s.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan score: %w", err)
 		}
 		scores = append(scores, s)

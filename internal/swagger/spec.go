@@ -534,11 +534,13 @@ func buildSchemas() map[string]any {
 		"UserScore": map[string]any{
 			"type": "object",
 			"properties": map[string]any{
-				"user_id":      map[string]any{"type": "string", "format": "uuid"},
-				"user_name":    map[string]any{"type": "string"},
-				"channel_id":   map[string]any{"type": "string", "format": "uuid"},
-				"total_points": map[string]any{"type": "integer", "example": 15},
-				"updated_at":   map[string]any{"type": "string", "format": "date-time"},
+				"user_id":               map[string]any{"type": "string", "format": "uuid"},
+				"user_name":             map[string]any{"type": "string"},
+				"channel_id":            map[string]any{"type": "string", "format": "uuid"},
+				"total_points":          map[string]any{"type": "integer", "example": 15},
+				"exact_score_count":     map[string]any{"type": "integer", "example": 5},
+				"correct_outcome_count": map[string]any{"type": "integer", "example": 10},
+				"updated_at":            map[string]any{"type": "string", "format": "date-time"},
 			},
 		},
 	}

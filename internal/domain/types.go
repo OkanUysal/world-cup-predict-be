@@ -71,11 +71,13 @@ type Prediction struct {
 }
 
 type UserScore struct {
-	UserID      uuid.UUID `json:"user_id"`
-	UserName    string    `json:"user_name"`
-	ChannelID   uuid.UUID `json:"channel_id"`
-	TotalPoints int       `json:"total_points"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	UserID              uuid.UUID `json:"user_id"`
+	UserName            string    `json:"user_name"`
+	ChannelID           uuid.UUID `json:"channel_id"`
+	TotalPoints         int       `json:"total_points"`
+	ExactScoreCount     int       `json:"exact_score_count"`
+	CorrectOutcomeCount int       `json:"correct_outcome_count"`
+	UpdatedAt           time.Time `json:"updated_at"`
 }
 
 type EventListFilter string
