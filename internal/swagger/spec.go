@@ -145,8 +145,8 @@ func buildPaths() map[string]any {
 		"/api/v1/users/{id}/predictions": map[string]any{
 			"get": map[string]any{
 				"tags":        []string{"User"},
-				"summary":     "Kullanıcı tahmin listesi",
-				"description": "Belirli bir kullanıcının tahminlerini listeler. Süresi geçmemiş açık tahminlerin içeriği gizlenir.",
+				"summary":     "Kullanıcı tahmin listesi (Kıyaslama)",
+				"description": "Belirli bir kullanıcının sonuçlanmış tahminlerini ve istek atan kullanıcının tahminlerini karşılaştırmalı listeler.",
 				"operationId": "getUserPredictions",
 				"security":    bearer(),
 				"parameters": []map[string]any{
@@ -159,7 +159,7 @@ func buildPaths() map[string]any {
 					},
 				},
 				"responses": map[string]any{
-					"200": jsonResponse("Kullanıcı tahminleri", arrayRef("EventWithPrediction")),
+					"200": jsonResponse("Kullanıcı tahminleri", arrayRef("PredictionComparison")),
 					"400": errorResponse("Geçersiz kullanıcı ID'si"),
 					"401": errorResponse("Yetkisiz"),
 					"403": errorResponse("Kanal üyeliği gerekli veya farklı kanal"),
@@ -540,6 +540,14 @@ func buildSchemas() map[string]any {
 			"properties": map[string]any{
 				"event":         ref("Event"),
 				"my_prediction": map[string]any{"allOf": []any{ref("Prediction")}, "nullable": true},
+			},
+		},
+		"PredictionComparison": map[string]any{
+			"type": "object",
+			"properties": map[string]any{
+				"event":             ref("Event"),
+				"target_prediction": map[string]any{"allOf": []any{ref("Prediction")}, "nullable": true},
+				"my_prediction":     map[string]any{"allOf": []any{ref("Prediction")}, "nullable": true},
 			},
 		},
 		"EventDetailResponse": map[string]any{

@@ -357,7 +357,7 @@ func (h *EventHandler) ListUserPredictions(w http.ResponseWriter, r *http.Reques
 	}
 
 	if predictions == nil {
-		predictions = []service.EventWithPrediction{}
+		predictions = []service.PredictionComparison{}
 	}
 
 	httputil.WriteJSON(w, http.StatusOK, predictions)

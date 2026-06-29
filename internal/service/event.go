@@ -255,29 +255,48 @@ func (s *EventService) ListPredictions(ctx context.Context, eventID, channelID u
 	return s.predictions.ListByEventAndChannel(ctx, eventID, channelID)
 }
 
-func (s *EventService) ListUserPredictions(ctx context.Context, targetUserID, requestingUserID uuid.UUID) ([]EventWithPrediction, error) {
+type PredictionComparison struct {
+	Event            domain.Event       `json:"event"`
+	TargetPrediction *domain.Prediction `json:"target_prediction,omitempty"`
+	MyPrediction     *domain.Prediction `json:"my_prediction,omitempty"`
+}
+
+func (s *EventService) ListUserPredictions(ctx context.Context, targetUserID, requestingUserID uuid.UUID) ([]PredictionComparison, error) {
 	if err := s.SyncStatuses(ctx); err != nil {
 		return nil, err
 	}
 
-	events, err := s.events.List(ctx, "") // Get all events
+	// Only fetch completed events
+	events, err := s.events.List(ctx, domain.EventFilterCompleted)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]EventWithPrediction, 0, len(events))
+	result := make([]PredictionComparison, 0, len(events))
 	for _, e := range rangeEvents(events) {
 		s.events.RefreshStatus(ctx, &e)
-		item := EventWithPrediction{Event: e}
-		p, err := s.predictions.GetByEventAndUser(ctx, e.ID, targetUserID)
+
+		var targetPred *domain.Prediction
+		tp, err := s.predictions.GetByEventAndUser(ctx, e.ID, targetUserID)
 		if err == nil {
-			// Redact prediction details if deadline hasn't passed and the requester is another user
-			if requestingUserID != targetUserID && e.Status == domain.EventStatusOpen && time.Now().Before(e.Deadline) {
-				p.Choice = json.RawMessage("null")
-			}
-			item.MyPrediction = p
+			targetPred = tp
+		} else if !errors.Is(err, repository.ErrNotFound) {
+			return nil, err
 		}
-		result = append(result, item)
+
+		var myPred *domain.Prediction
+		mp, err := s.predictions.GetByEventAndUser(ctx, e.ID, requestingUserID)
+		if err == nil {
+			myPred = mp
+		} else if !errors.Is(err, repository.ErrNotFound) {
+			return nil, err
+		}
+
+		result = append(result, PredictionComparison{
+			Event:            e,
+			TargetPrediction: targetPred,
+			MyPrediction:     myPred,
+		})
 	}
 	return result, nil
 }
